@@ -227,7 +227,6 @@ class GeofenceForegroundServicePlugin : FlutterPlugin, MethodCallHandler, Activi
 
     private fun geofencingClient() : GeofencingClient = LocationServices.getGeofencingClient(context)
 
-    fun removeAllGeoFences() {}
 
     override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
         channel.setMethodCallHandler(null)
