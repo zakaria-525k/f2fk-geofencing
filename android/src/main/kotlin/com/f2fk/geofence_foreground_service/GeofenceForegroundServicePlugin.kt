@@ -75,6 +75,8 @@ class GeofenceForegroundServicePlugin : FlutterPlugin, MethodCallHandler, Activi
         ApiMethods.addGeofence -> addGeofence(Zone.fromJson(argumentsMap(call.arguments)), result)
         ApiMethods.addGeoFences -> addGeoFences(ZonesList.fromJson(argumentsMap(call.arguments)), result)
         ApiMethods.removeGeofence -> removeGeofence(listOf(call.argument(Constants.zoneId)!!), result)
+        ApiMethods.removeAllGeoFences ->  removeAllGeoFences(result)
+
         else -> result.notImplemented()
     }
 
@@ -196,6 +198,30 @@ class GeofenceForegroundServicePlugin : FlutterPlugin, MethodCallHandler, Activi
             result.success(true)
         }.addOnFailureListener { e: java.lang.Exception? ->
             result.error(geofenceRemoveFailure.toString(), e?.message, e?.stackTrace)
+        }
+    }
+
+    private fun removeAllGeoFences(result: Result) {
+        val geofencingClient = LocationServices.getGeofencingClient(context)
+
+        val geofenceIntent = Intent(context, GeofenceForegroundService::class.java)
+        val pendingIntent: PendingIntent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            PendingIntent.getForegroundService(
+                context, 0, geofenceIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
+            )
+        } else {
+            PendingIntent.getService(
+                context, 0, geofenceIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
+            )
+        }
+
+        geofencingClient.removeGeofences(pendingIntent).addOnSuccessListener {
+            result.success(true)
+        }.addOnFailureListener { e ->
+            val stackTraceString = e.stackTraceToString()
+            result.error(
+                geofenceRemoveFailure.toString(), e.message, stackTraceString
+            )
         }
     }
 

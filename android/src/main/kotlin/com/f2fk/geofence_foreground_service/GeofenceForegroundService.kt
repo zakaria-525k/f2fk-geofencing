@@ -124,7 +124,7 @@ class GeofenceForegroundService : Service() {
             handleGeofenceEvent(intent)
         }
 
-        return START_STICKY
+        return START_REDELIVER_INTENT
     }
 
     private fun handleGeofenceEvent(intent: Intent) {
